@@ -29,28 +29,34 @@ function Server() {
  * @param game_port
  */
 Server.prototype.start = function(player_port, game_port) {
-    var self = this;
     game_server.listen(game_port);
     player_server.listen(player_port);
-
-    game_server.on('initialised', function(initalGame_id){
-        self.game_id = initalGame_id;
-    })
-
-    this.registerPlayer();
-
-
+    this.ServerEvents(game_port);
 }
 
 
-Server.prototype.registerPlayer = function () {
+Server.prototype.ServerEvents = function (game_port) {
     var self = this;
 
-    player_server.on('register', function(player, student_id) {
 
-        //todo problem with adding player
+
+    game_server.on('initialised', function(inital_game_id){
+        self.game_id = inital_game_id;
+    })
+    player_server.on('register', function(player, student_id) {
+    //'player' arugment - "NOTE The player argument must be the actual socket that the has made the request to register."
+        //game_server.addSocket(player, self.gameId());
+        //console.log('*');
+        //console.log(game_server.socketId(player));
+
         game_server.addPlayer(player, self.getNextColour(), self.gameId());
     })
+    player_server.on('move', function(player, move_data) {
+        game_server.makeMove(player,move_data);
+
+
+    })
+
 
 
 }
