@@ -38,8 +38,6 @@ Server.prototype.start = function(player_port, game_port) {
 Server.prototype.ServerEvents = function (game_port) {
     var self = this;
 
-
-
     this.game_server.on('initialised', function(inital_game_id){
         self.game_id = inital_game_id;
     })
@@ -48,12 +46,7 @@ Server.prototype.ServerEvents = function (game_port) {
     })
     this.player_server.on('move', function(player, move_data) {
         self.game_server.makeMove(player,move_data);
-
-
     })
-
-
-
 }
 
 

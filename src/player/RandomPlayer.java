@@ -16,8 +16,12 @@ import java.util.Set;
  * which must be one from the list.
  */
 public class RandomPlayer implements Player {
+
     public RandomPlayer(ScotlandYardView view, String graphFilename) {
         //TODO: A better AI makes use of `view` and `graphFilename`.
+
+
+
     }
 
     @Override
@@ -33,5 +37,12 @@ public class RandomPlayer implements Player {
         }
 
         return null;
+    }
+
+    public void score(){
+
+
+
+        System.out.println("score");
     }
 }
