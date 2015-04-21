@@ -59,11 +59,11 @@ public class GuiGame {
 
         PlayerFactory factory = new RandomPlayerFactory(typeMap, imageFilename, positionsFilename);
         ScotlandYard game = new ScotlandYardModel(5, rounds, graphFilename);
-        game.join(factory.player(Colour.Black,  game, graphFilename), Colour.Black, 194, mrXTickets);
-        game.join(factory.player(Colour.Blue,   game, graphFilename), Colour.Blue, 155, new HashMap<Ticket, Integer>(detectiveXTickets));
+        game.join(factory.player(Colour.Black,  game, graphFilename), Colour.Black, 10, mrXTickets);
+        game.join(factory.player(Colour.Blue,   game, graphFilename), Colour.Blue, 20, new HashMap<Ticket, Integer>(detectiveXTickets));
         game.join(factory.player(Colour.Green,  game, graphFilename), Colour.Green, 15, new HashMap<Ticket, Integer>(detectiveXTickets));
         game.join(factory.player(Colour.Red,    game, graphFilename), Colour.Red, 6, new HashMap<Ticket, Integer>(detectiveXTickets));
-        game.join(factory.player(Colour.Yellow, game, graphFilename), Colour.Yellow, 167, new HashMap<Ticket, Integer>(detectiveXTickets));
+        game.join(factory.player(Colour.Yellow, game, graphFilename), Colour.Yellow, 13, new HashMap<Ticket, Integer>(detectiveXTickets));
         game.join(factory.player(Colour.White,  game, graphFilename), Colour.White, 5, new HashMap<Ticket, Integer>(detectiveXTickets));
 
 
