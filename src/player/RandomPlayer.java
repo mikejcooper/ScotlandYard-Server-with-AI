@@ -49,7 +49,7 @@ public class RandomPlayer implements Player {
     }
 
     public void score(Set<Move> moves){
-//        distanceScore();
+        int list = distanceScore();
         targetLocations(moves);
 
 
@@ -60,9 +60,12 @@ public class RandomPlayer implements Player {
     private int distanceScore(){
         distanceAlgorithm algo = new distanceAlgorithm(graph,view);
         ArrayList<Integer> set = algo.calculate();
+        int ans = 0;
+        for(int n : set){
+            ans += n;
+        }
 
-
-        return 0;
+        return ans;
     }
 
     private int orientationOnBoard(){
