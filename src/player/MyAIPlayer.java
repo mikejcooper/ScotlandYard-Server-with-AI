@@ -1,29 +1,25 @@
 package player;
 
-import javafx.collections.transformation.SortedList;
 import scotlandyard.*;
 
-import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * The RandomPlayer class is an example of a very simple AI that
- * makes a random move from the given set of moves. Since the
- * RandomPlayer implements Player, the only required method is
- * notify(), which takes the location of the player and the
- * list of valid moves. The return value is the desired move,
- * which must be one from the list.
+ * Created by gebruiker on 24/04/2015.
  */
-public class RandomPlayer implements Player {
+public class MyAIPlayer implements Player {
 
     private ScotlandYardView view;
     private Graph graph;
+    private Map<Integer, Move> moveMap;
 
-    public RandomPlayer(ScotlandYardView view, String graphFilename) {
+    public MyAIPlayer(ScotlandYardView view, String graphFilename) {
         //TODO: A better AI makes use of `view` and `graphFilename`.
         this.view = view;
         ScotlandYardGraphReader graphReader = new ScotlandYardGraphReader();
+        moveMap = new HashMap<Integer, Move>();
         try {
             graph = graphReader.readGraph(graphFilename);
         } catch (IOException e) {
@@ -34,23 +30,27 @@ public class RandomPlayer implements Player {
 
     @Override
     public Move notify(int location, Set<Move> moves) {
-        //TODO: Some clever AI here ...
+        // if(view.getCurrentPlayer() == Colour.Black) score(moves,location);
 
-     //   if(view.getCurrentPlayer() == Colour.Black) score(moves,location);
-
-
-        int choice = new Random().nextInt(moves.size());
         for (Move move : moves) {
-            if (choice == 0) {
-                return move;
-            }
-            choice--;
+            if (move instanceof MoveTicket) {
+                moveMap.put(score(moves, ((MoveTicket) move).target), move);
+            } else if (move instanceof MoveDouble) {
+                moveMap.put(score(moves, ((MoveDouble) move).move2.target), move);
+            }else moveMap.put(300,move);
         }
 
-        return null;
+        Move move = returnBestMove();
+        int rating;
+        if(move instanceof MoveTicket) rating = ((MoveTicket) move).target;
+        else rating = ((MoveDouble) move).move2.target;
+
+        System.out.println("this is my move rating " + score(moves, rating));
+        return move;
     }
 
-    public void score(Set<Move> moves ,int location){
+
+    public int score(Set<Move> moves, int location) {
         int orientation = orientationOnBoard(location);
         int list = distanceScore(location);
         int targets = targetLocations(moves);
@@ -58,25 +58,33 @@ public class RandomPlayer implements Player {
 
         System.out.println("rating " + total);
         System.out.println(location);
+
+        return total;
     }
 
-    private int distanceScore(int location){
-        distanceAlgorithm algo = new distanceAlgorithm(graph,view);
+    private int distanceScore(int location) {
+        distanceAlgorithm algo = new distanceAlgorithm(graph, view);
         ArrayList<Integer> set = algo.calculate(location);
         int ans = 0;
-        for(int n : set){
-            switch(n){
-                case 1: ans += 30;
-                        break;
-                case 2: ans += 18;
-                        break;
-                case 3: ans += 12;
+        for (int n : set) {
+            switch (n) {
+                case 1:
+                    ans += 30;
                     break;
-                case 4: ans += 6;
+                case 2:
+                    ans += 18;
                     break;
-                case 5: ans += 3;
+                case 3:
+                    ans += 12;
                     break;
-                default: ans += 0;
+                case 4:
+                    ans += 6;
+                    break;
+                case 5:
+                    ans += 3;
+                    break;
+                default:
+                    ans += 0;
                     break;
             }
         }
@@ -84,7 +92,7 @@ public class RandomPlayer implements Player {
         return ans;
     }
 
-    private int orientationOnBoard(int location){
+    private int orientationOnBoard(int location) {
         String zone1 = "80 81 82 99 100 101 110 111 112 113 114 126 125 131 132";
         String zone2 = "49 79 63 64 65 66 97 98 83 102 115 109 130 139 140 154";
         String zone3 = "35 36 48 62 78 96 124 138 152 150 151 153 155 156 157 141 134 133 127 118 116 104 103 85 84 67 68 50";
@@ -103,38 +111,43 @@ public class RandomPlayer implements Player {
 
         String locationString = Integer.toString(location);
 
-        if(Arrays.asList(string1).contains(locationString)) return 0;
-        if(Arrays.asList(string2).contains(locationString)) return 4;
-        if(Arrays.asList(string3).contains(locationString)) return 7;
-        if(Arrays.asList(string4).contains(locationString)) return 10;
-        if(Arrays.asList(string5).contains(locationString)) return 13;
-        if(Arrays.asList(string6).contains(locationString)) return 17;
-        if(Arrays.asList(string7).contains(locationString)) return 20;
+        if (Arrays.asList(string1).contains(locationString)) return 0;
+        if (Arrays.asList(string2).contains(locationString)) return 4;
+        if (Arrays.asList(string3).contains(locationString)) return 7;
+        if (Arrays.asList(string4).contains(locationString)) return 10;
+        if (Arrays.asList(string5).contains(locationString)) return 13;
+        if (Arrays.asList(string6).contains(locationString)) return 17;
+        if (Arrays.asList(string7).contains(locationString)) return 20;
 
 
         return 0;
     }
 
 
-
-
-    private int targetLocations(Set<Move> moves){
+    private int targetLocations(Set<Move> moves) {
         Set<Integer> targets = new HashSet<Integer>();
-        for(Move move : moves){
-            if(move instanceof MoveTicket){
+        for (Move move : moves) {
+            if (move instanceof MoveTicket) {
                 targets.add(((MoveTicket) move).target);
             }
-            if(move instanceof MoveDouble){
+            if (move instanceof MoveDouble) {
                 targets.add(((MoveDouble) move).move1.target);
                 targets.add(((MoveDouble) move).move2.target);
             }
         }
 
-      return targets.size();
+        return 30 - targets.size();
     }
 
 
+    private Move returnBestMove(){
+        int lowest = 5000;
+        Set<Integer> set = moveMap.keySet();
+        for(int n : set){
+            if(n < lowest) lowest = n;
+        }
 
-
+        return moveMap.get(lowest);
+    }
 
 }

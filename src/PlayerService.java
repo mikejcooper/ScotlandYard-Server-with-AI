@@ -1,5 +1,6 @@
 import net.PlayerClient;
 import net.PlayerFactory;
+import player.MyPlayerFactory;
 import player.RandomPlayerFactory;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class PlayerService {
         List<String> studentIds = Arrays.asList(Arrays.copyOfRange(args, 2, args.length));
 
         // TODO: This factory should be replaced with a clever AI.
-        PlayerFactory factory = new RandomPlayerFactory();
+        PlayerFactory factory = new MyPlayerFactory();
 
         PlayerClient client = new PlayerClient(host, port, studentIds, factory);
         client.run();
