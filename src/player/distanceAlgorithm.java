@@ -22,10 +22,10 @@ public class distanceAlgorithm {
         mapNodeValue = new HashMap<Node, Integer>();
     }
 
-    public ArrayList<Integer> calculate(){
-        //if(view.getPlayerLocation(Colour.Black) == 0) return new HashSet<Integer>();
-        visitedNodes.add(graph.getNode(view.getPlayerLocation(Colour.Black ) + 1));
-        searchingNodes.add(graph.getNode(view.getPlayerLocation(Colour.Black) + 1));
+    public ArrayList<Integer> calculate(int location){
+        if(location == 0) return new ArrayList<Integer>();
+        visitedNodes.add(graph.getNode(location));
+        searchingNodes.add(graph.getNode(location));
         int distance = 1;
 
         while (!areAllDetectivesMarked()) {
@@ -82,7 +82,7 @@ public class distanceAlgorithm {
         Set<Edge> edges = graph.getEdges();
         Set<Node> set = new HashSet<Node>();
         for(Edge e : edges){
-            if(e.source() == n.data() && e.data() != Route.Boat && !visitedNodes.contains(graph.getNode(e.target()))){
+            if( Integer.parseInt(e.source().toString()) == Integer.parseInt(n.data().toString()) && e.data() != Route.Boat && !visitedNodes.contains(graph.getNode(e.target()))){
                 set.add(graph.getNode(e.target()));
             }
 //            if(e.target() == n.data() && e.data() != Route.Boat && !visitedNodes.contains(graph.getNode(e.target()))){
