@@ -13,13 +13,11 @@ public class MyAIPlayer implements Player {
 
     private ScotlandYardView view;
     private Graph graph;
-    private Map<Integer, Move> moveMap;
 
     public MyAIPlayer(ScotlandYardView view, String graphFilename) {
         //TODO: A better AI makes use of `view` and `graphFilename`.
         this.view = view;
         ScotlandYardGraphReader graphReader = new ScotlandYardGraphReader();
-        moveMap = new HashMap<Integer, Move>();
         try {
             graph = graphReader.readGraph(graphFilename);
         } catch (IOException e) {
@@ -31,29 +29,34 @@ public class MyAIPlayer implements Player {
     @Override
     public Move notify(int location, Set<Move> moves) {
         // if(view.getCurrentPlayer() == Colour.Black) score(moves,location);
+        ArrayList<Integer> targets = new ArrayList<Integer>();
+        Map<Integer, Move> moveMap = new HashMap<Integer, Move>();
 
         for (Move move : moves) {
             if (move instanceof MoveTicket) {
-                moveMap.put(score(moves, ((MoveTicket) move).target), move);
+                if(!targets.contains(((MoveTicket) move).target)){
+                    moveMap.put(score(moves, ((MoveTicket) move).target), move);
+                    targets.add(((MoveTicket) move).target);
+                }
             } else if (move instanceof MoveDouble) {
-                moveMap.put(score(moves, ((MoveDouble) move).move2.target), move);
-            }else moveMap.put(300,move);
+                if(!targets.contains(((MoveDouble) move).move2.target)){
+                    moveMap.put(score(moves, ((MoveDouble) move).move2.target), move);
+                    targets.add(((MoveDouble) move).move2.target);
+                }
+            }
         }
 
-        Move move = returnBestMove();
-        int rating;
-        if(move instanceof MoveTicket) rating = ((MoveTicket) move).target;
-        else rating = ((MoveDouble) move).move2.target;
+        Tuple tuple = returnBestMove(moveMap);
 
-        System.out.println("this is my move rating " + score(moves, rating));
-        return move;
+        System.out.println("this is my move rating " + tuple.getRating());
+        return tuple.getMove();
     }
 
 
     public int score(Set<Move> moves, int location) {
         int orientation = orientationOnBoard(location);
         int list = distanceScore(location);
-        int targets = targetLocations(moves);
+        int targets = targetLocations(location);
         int total = orientation + list + targets;
 
         System.out.println("rating " + total);
@@ -112,42 +115,40 @@ public class MyAIPlayer implements Player {
         String locationString = Integer.toString(location);
 
         if (Arrays.asList(string1).contains(locationString)) return 0;
-        if (Arrays.asList(string2).contains(locationString)) return 4;
-        if (Arrays.asList(string3).contains(locationString)) return 7;
-        if (Arrays.asList(string4).contains(locationString)) return 10;
-        if (Arrays.asList(string5).contains(locationString)) return 13;
-        if (Arrays.asList(string6).contains(locationString)) return 17;
-        if (Arrays.asList(string7).contains(locationString)) return 20;
+        if (Arrays.asList(string2).contains(locationString)) return 2;
+        if (Arrays.asList(string3).contains(locationString)) return 3;
+        if (Arrays.asList(string4).contains(locationString)) return 5;
+        if (Arrays.asList(string5).contains(locationString)) return 6;
+        if (Arrays.asList(string6).contains(locationString)) return 8;
+        if (Arrays.asList(string7).contains(locationString)) return 10;
 
 
         return 0;
     }
 
-
-    private int targetLocations(Set<Move> moves) {
+    //this is not perfect need to find a way to get validmoves of any location
+    private int targetLocations(int location) {
         Set<Integer> targets = new HashSet<Integer>();
-        for (Move move : moves) {
-            if (move instanceof MoveTicket) {
-                targets.add(((MoveTicket) move).target);
-            }
-            if (move instanceof MoveDouble) {
-                targets.add(((MoveDouble) move).move1.target);
-                targets.add(((MoveDouble) move).move2.target);
+        Set<Edge> edges = graph.getEdges();
+        for(Edge e :edges){
+            if( Integer.parseInt(e.source().toString()) == location){
+                targets.add(Integer.parseInt(e.target().toString()));
             }
         }
 
-        return 30 - targets.size();
+
+        return  -targets.size();
     }
 
 
-    private Move returnBestMove(){
+    private Tuple returnBestMove(Map<Integer,Move> moveMap){
         int lowest = 5000;
         Set<Integer> set = moveMap.keySet();
         for(int n : set){
             if(n < lowest) lowest = n;
         }
 
-        return moveMap.get(lowest);
+        return new Tuple(moveMap.get(lowest),lowest);
     }
 
 }
